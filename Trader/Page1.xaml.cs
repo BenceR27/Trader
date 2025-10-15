@@ -20,9 +20,33 @@ namespace Trader
     /// </summary>
     public partial class Page1 : Page
     {
+        private readonly DatabaseStatements db = new DatabaseStatements();
+
         public Page1()
         {
             InitializeComponent();
         }
+
+        private void regButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (passwordPassbox.Password == passwordPassboxAg.Password)
+            {
+                var user = new
+                {
+                    UserName = usernameTextbox.Text,
+                    UserPassword = passwordPassbox.Password,
+                    Fullname = fullnameTextbox.Text,
+                    Salt = "",
+                    Email = emailTextbox.Text
+                };
+
+                MessageBox.Show(db.AddNewUser(user).ToString());
+            }
+            else
+            {
+                MessageBox.Show("Eltérő jelszavak");
+            }
+        }
     }
 }
+

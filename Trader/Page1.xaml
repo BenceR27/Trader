@@ -24,7 +24,7 @@
         </Grid.ColumnDefinitions>
 
         <TextBlock
-            Text="Felhasználnév"
+            Text="Felhasználónév"
             FontSize="23"
             FontWeight="Bold"
             HorizontalAlignment="Right"
@@ -69,6 +69,7 @@
             Grid.Row="4"
             />
         <TextBox
+            x:Name="usernameTextbox"
             FontSize="18"
             HorizontalContentAlignment="Center"
             Margin="10,10,10,10"
@@ -76,6 +77,7 @@
             Grid.Column="1"
             />
         <PasswordBox
+            x:Name="passwordPassbox"
             FontSize="18"
             HorizontalContentAlignment="Center"
             Margin="10,10,10,10"
@@ -83,6 +85,7 @@
             Grid.Column="1"
             />
         <PasswordBox
+            x:Name="passwordPassboxAg"
             FontSize="18"
             HorizontalContentAlignment="Center"
             Margin="10,10,10,10"
@@ -90,6 +93,7 @@
             Grid.Column="1"
             />
         <TextBox
+            x:Name="fullnameTextbox"
             FontSize="18"
             HorizontalContentAlignment="Center"
             Margin="10,10,10,10"
@@ -97,6 +101,7 @@
             Grid.Column="1"
             />
         <TextBox
+            x:Name="emailTextbox"
             FontSize="18"
             HorizontalContentAlignment="Center"
             Margin="10,10,10,10"
@@ -111,6 +116,7 @@
                 Margin="15"
                 Background="Red"
                 Foreground="White"
+                Click="regButton_Click"
                 />
         </StackPanel>
     </Grid>
