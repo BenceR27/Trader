@@ -49,3 +49,7 @@ C:\Users\rizb\source\repos\Trader\Trader\bin\Debug\System.Numerics.Vectors.xml
 C:\Users\rizb\source\repos\Trader\Trader\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 C:\Users\rizb\source\repos\Trader\Trader\bin\Debug\System.Threading.Tasks.Extensions.xml
 C:\Users\rizb\source\repos\Trader\Trader\obj\Debug\Trader.csproj.Up2Date
+C:\Users\rizb\source\repos\Trader\Trader\obj\Debug\AdminPanel.g.cs
+C:\Users\rizb\source\repos\Trader\Trader\obj\Debug\Login.g.cs
+C:\Users\rizb\source\repos\Trader\Trader\obj\Debug\AdminPanel.baml
+C:\Users\rizb\source\repos\Trader\Trader\obj\Debug\Login.baml

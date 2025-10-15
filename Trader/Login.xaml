@@ -8,7 +8,71 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Login">
 
-    <Grid>
-        
+    <Grid Margin="5,5,5,5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock
+        Text="Felhasználónév"
+        FontSize="23"
+        FontWeight="Bold"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Center"
+        Grid.Row="0"
+        Grid.Column="0"
+        />
+        <TextBlock
+        Text="Jelszó"
+        FontSize="23"
+        FontWeight="Bold"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Center"
+        Grid.Column="0"
+        Grid.Row="1"
+        />
+        <TextBox
+        x:Name="usernameTextbox"
+        FontSize="18"
+        HorizontalContentAlignment="Center"
+        Margin="10,10,10,10"
+        Grid.Row="0"
+        Grid.Column="1"
+        />
+        <PasswordBox
+        x:Name="passwordPassbox"
+        FontSize="18"
+        HorizontalContentAlignment="Center"
+        Margin="10,10,10,10"
+        Grid.Row="1"
+        Grid.Column="1"
+        />
+        <StackPanel Grid.Row="5" Grid.Column="0" Height="Auto">
+            <TextBlock Margin="5">
+                <Hyperlink
+                    x:Name="regLink"
+                    FontSize="23"
+                    Click="regLink_Click"
+                    >Regisztrálok
+                </Hyperlink>
+            </TextBlock>
+            <Button
+            x:Name="logButton"
+            Content="Belépés"
+            FontSize="23"
+            Margin="15"
+            Background="Red"
+            Foreground="White"
+            HorizontalContentAlignment="Center"
+            Click="logButton_Click"
+            />
+        </StackPanel>
     </Grid>
 </Page>

@@ -21,10 +21,12 @@ namespace Trader
     public partial class Page1 : Page
     {
         private readonly DatabaseStatements db = new DatabaseStatements();
+        private readonly  MainWindow _mainWindow;
 
-        public Page1()
+        public Page1(MainWindow mainWindow)
         {
             InitializeComponent();
+            _mainWindow = mainWindow;
         }
 
         private void regButton_Click(object sender, RoutedEventArgs e)
@@ -41,6 +43,7 @@ namespace Trader
                 };
 
                 MessageBox.Show(db.AddNewUser(user).ToString());
+                _mainWindow.StartWindow.Navigate(new Login(_mainWindow));
             }
             else
             {
