@@ -1,84 +1,154 @@
 ﻿using MySql.Data.MySqlClient;
-using Mysqlx.Crud;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 
 namespace Trader
 {
     internal class DatabaseStatements
     {
-        Connect conn = new Connect();
+        // Assuming you already have a Connect class that provides conn._connection
+        private readonly Connect conn = new Connect();
 
         public object AddNewUser(object user)
         {
             try
             {
-            conn._connection.Open();
+                conn._connection.Open();
 
-            string sql= "INSERT INTO `users`( `UserName`, `FullName`, `Password`, `Salt`, `Email`) " +
-                "VALUES(@username, @fullname, @password, @salt, @email";
+                var newUser = user.GetType().GetProperties();
 
-            MySqlCommand cmd = new MySqlCommand(sql, conn._connection);
+                string salt = GenerateSalt();
+                string passwordHash = ComputeHmacSha256(newUser[2].GetValue(user).ToString(), salt);
 
-                var newuser = user.GetType().GetProperties();
-    
-            cmd.Parameters.AddWithValue("@username", newuser[0].GetValue(user));
-            cmd.Parameters.AddWithValue("@fullname", newuser[1].GetValue(user));
-            cmd.Parameters.AddWithValue("@password", newuser[2].GetValue(user));
-            cmd.Parameters.AddWithValue("@salt", newuser[3].GetValue(user));
-            cmd.Parameters.AddWithValue("@email", newuser[4].GetValue(user));
+                string sql = "INSERT INTO `users`(`UserName`, `FullName`, `Password`, `Salt`, `Email`) VALUES (@username, @fullname, @password, @salt, @email)";
 
-            cmd.ExecuteNonQuery();
+                MySqlCommand cmd = new MySqlCommand(sql, conn._connection);
 
-            conn._connection.Close();
+                cmd.Parameters.AddWithValue("@username", newUser[0].GetValue(user));
+                cmd.Parameters.AddWithValue("@fullname", newUser[1].GetValue(user));
+                cmd.Parameters.AddWithValue("@password", passwordHash);
+                cmd.Parameters.AddWithValue("@salt", salt);
+                cmd.Parameters.AddWithValue("@email", newUser[4].GetValue(user));
 
-            return new { message = "Siketes hozzáadás." };
+                cmd.ExecuteNonQuery();
 
+                conn._connection.Close();
+
+                return new { message = "Sikeres hozzáadás." };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                if (conn._connection.State == ConnectionState.Open)
+                    conn._connection.Close();
 
-                throw;
+                return new { message = ex.Message };
             }
         }
+
         public object LoginUser(object user)
         {
-            conn._connection.Open();
-            string sql = "SELECT * FROM users Where UserName = @username AND Password = @password";
-            MySqlCommand cmd = new MySqlCommand(sql, conn._connection);
-            var logUser = user.GetType().GetProperties();
+            try
+            {
+                conn._connection.Open();
+                string sql = "SELECT * FROM users WHERE UserName = @username AND Password = @password";
+                MySqlCommand cmd = new MySqlCommand(sql, conn._connection);
+                var logUser = user.GetType().GetProperties();
 
-            cmd.Parameters.AddWithValue("@username", logUser[0].GetValue(user));
-            cmd.Parameters.AddWithValue("@password", logUser[1].GetValue(user));
+                cmd.Parameters.AddWithValue("@username", logUser[0].GetValue(user));
+                cmd.Parameters.AddWithValue("@password", logUser[1].GetValue(user));
 
-            MySqlDataReader reader = cmd.ExecuteReader();
+                MySqlDataReader reader = cmd.ExecuteReader();
+                object isRegistered = reader.Read()
+                    ? new { message = "Regisztrált" }
+                    : new { message = "Nem regisztrált" };
 
-            object isRegistered = reader.Read() ? new { message = "Regisztrált" } : new { message = "Nem regisztrált" };
-            
-            conn._connection.Close();
-            
-            return isRegistered;
+                conn._connection.Close();
+                return isRegistered;
+            }
+            catch (Exception ex)
+            {
+                if (conn._connection.State == ConnectionState.Open)
+                    conn._connection.Close();
+
+                return new { message = ex.Message };
+            }
         }
 
-        public DataView UserList()
+        public DataView GetUserList()
         {
-            conn._connection.Open();
+            try
+            {
+                conn._connection.Open();
+                string sql = "SELECT * FROM users";
 
-            string sql = "SELECT * FROM users";
+                MySqlCommand cmd = new MySqlCommand(sql, conn._connection);
+                MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
 
-            MySqlCommand cmd = new MySqlCommand(sql, conn._connection);
+                return dt.DefaultView;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading users: " + ex.Message);
+                return null;
+            }
+            finally
+            {
+                if (conn._connection.State == ConnectionState.Open)
+                    conn._connection.Close();
+            }
+        }
 
-            MySqlDataAdapter adapter = new MySqlDataAdapter();
-            DataTable dt = new DataTable();
+        public void DeleteUser(int userId)
+        {
+            string query = "DELETE FROM users WHERE Id = @Id";
 
-            adapter.Fill(dt);
+            try
+            {
+                conn._connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand(query, conn._connection))
+                {
+                    cmd.Parameters.AddWithValue("@Id", userId);
+                    int rowsAffected = cmd.ExecuteNonQuery();
 
-            conn._connection.Close();
-            return dt.DefaultView;
+                    if (rowsAffected > 0)
+                        MessageBox.Show("User deleted successfully!");
+                    else
+                        MessageBox.Show("No user found with that ID.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error deleting user: " + ex.Message);
+            }
+            finally
+            {
+                if (conn._connection.State == ConnectionState.Open)
+                    conn._connection.Close();
+            }
+        }
+
+        public string GenerateSalt()
+        {
+            byte[] salt = new byte[16];
+            using (var rnd = RandomNumberGenerator.Create())
+            {
+                rnd.GetBytes(salt);
+            }
+            return Convert.ToBase64String(salt);
+        }
+
+        public string ComputeHmacSha256(string password, string salt)
+        {
+            using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(salt)))
+            {
+                byte[] hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hash);
+            }
         }
     }
 }

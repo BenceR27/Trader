@@ -1,32 +1,45 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Data;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Trader
 {
-    /// <summary>
-    /// Interaction logic for AdminPanel.xaml
-    /// </summary>
     public partial class AdminPanel : Page
     {
-        private readonly DatabaseStatements _databasestatements = new DatabaseStatements();
-        private readonly MainWindow _mainWindow;
-        public AdminPanel(MainWindow mainWindow)
+        private readonly DatabaseStatements db = new DatabaseStatements();
+
+        public AdminPanel()
         {
             InitializeComponent();
-            _mainWindow = mainWindow;
-            userDataGrid.ItemsSource = _databasestatements.UserList();
+            LoadUserList();
+        }
+
+        private void LoadUserList()
+        {
+            userDataGrid.ItemsSource = db.GetUserList();
+        }
+
+        private void userDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (userDataGrid.SelectedItem is DataRowView row)
+            {
+                int userId = Convert.ToInt32(row["Id"]);
+                string userName = row["UserName"].ToString();
+
+                MessageBoxResult result = MessageBox.Show(
+                    $"Are you sure you want to delete user '{userName}'?",
+                    "Confirm Delete",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    db.DeleteUser(userId);
+                    LoadUserList(); 
+                }
+            }
         }
     }
 }

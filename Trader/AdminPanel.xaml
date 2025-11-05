@@ -9,6 +9,9 @@
       Title="AdminPanel">
 
     <Grid Margin="50">
-        <DataGrid x:Name="userDataGrid"/>
+        <DataGrid x:Name="userDataGrid"
+                  AutoGenerateColumns="True"
+                  MouseDoubleClick="userDataGrid_MouseDoubleClick"
+                  IsReadOnly="True"/>
     </Grid>
 </Page>
